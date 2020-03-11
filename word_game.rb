@@ -1,8 +1,13 @@
 #! /usr/bin/env ruby
 
+# require gems for making api
+require 'uri'
+require 'openssl'
 require 'net/https'
 require 'httparty' 
 require 'json'
+
+# require gems for others
 require 'tty-prompt'
 require 'colorize'
 require 'tty-box'
@@ -32,29 +37,28 @@ end
 
 # find word in dictionary
 def get_word(word)
-    error_message = []
-    response = nil
-    uri = URI('https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/' + word)
-    use_ssl = true
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = use_ssl
-    http.start do |http|
-        req = Net::HTTP::Get.new(uri)
-        req['app_id'] = 'a64687ef'
-        req['app_key'] = '5a1197b3e1f21172c523911f13c914ed'
-        req['Accept'] = 'application/json'
-        response = http.request(req)
-        resp = response.body
-        # parse Json to Hash
-        my_resp = JSON.parse(resp)
+   
+    # response = nil
+    url = URI("https://wordsapiv1.p.rapidapi.com/words/#{word}")
 
-        if my_resp['id'] == word
-            return true
-        else 
-            return false
-        end
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    
+    request = Net::HTTP::Get.new(url) 
+    request["x-rapidapi-host"] = 'wordsapiv1.p.rapidapi.com'
+    request["x-rapidapi-key"] = '1b2c49a91bmshddce31cebd15864p1a6966jsn68d6321288f9' #api key
+    
+    response = http.request(request) #save req to resonse
+    # puts response.body
+    my_resp = JSON.parse(response.body) #parse response to JSON
+    if my_resp["word"] == word #return true if word exist
+        return true
+    else 
+        return false
     end
 end
+
 
 def check_letter(shuffle, input)
 

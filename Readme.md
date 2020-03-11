@@ -1,3 +1,14 @@
+
+
+Source code can be found at the repo:
+https://github.com/lingyenlee/Ruby_Word_Game
+
+## Software Development Plan
+
+
+
+
+
 Word Game
 
 -The goal of the game is to score as many points from forming words from a 10-letter word to reach the chosen difficulty level

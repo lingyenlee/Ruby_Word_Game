@@ -5,6 +5,7 @@
 # shuffle = array.shuffle
 # puts shuffle.to_s
 
+
 require 'nokogiri'
 require 'open-uri'
 require 'json'
