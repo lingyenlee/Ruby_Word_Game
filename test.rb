@@ -14,13 +14,13 @@ doc = Nokogiri::HTML(open('https://wordfinder.yourdictionary.com/letter-words/10
 
 words = []
 
-table = doc.at("table")
-table.search('td.table-cell-word').each do |i|
-    words.push(i.content)
-end
+# table = doc.at("table")
+# table.search('td.table-cell-word').each do |i|
+#     words.push(i.content)
+# end
 
-puts words
-# binding.pry
+# puts words
+# # binding.pry
 # puts doc
 
 # puts "### Search for nodes by css"
@@ -33,12 +33,12 @@ puts words
 #   puts link.content
 # end
 
-# puts "### Or mix and match."
-# rows = doc.css("td.table-cell-word")
+puts "### Or mix and match."
+# rows = doc.css("td.table-cell-inner-con")
 # puts rows
-# doc.search('td.table-cell-word').each do |link|
-# #     words = []
-# #   words.push(link.content)
-# puts link.content
-# #   puts words.to_s
-# end
+doc.search('td.table-cell-word').each do |link|
+#     words = []
+#   words.push(link.content)
+puts link.content
+#   puts words.to_s
+end

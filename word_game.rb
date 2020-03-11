@@ -4,6 +4,9 @@ require 'net/https'
 require 'httparty' 
 require 'json'
 require 'tty-prompt'
+require 'colorize'
+require 'tty-box'
+require 'tty-font'
 
 
 # randomly shuffle word
@@ -14,7 +17,7 @@ def shuffle_word(word)
     return shuffled_word
 end
 
-# track count of elements in array with hash
+# make hash to track elements in array
 def make_hash(word)
     hash = {}
     word.each do |i|
@@ -45,8 +48,6 @@ def get_word(word)
         # parse Json to Hash
         my_resp = JSON.parse(resp)
 
-        # return my_resp['id']
-        # if my_resp['id']
         if my_resp['id'] == word
             return true
         else 
@@ -62,10 +63,11 @@ def check_letter(shuffle, input)
     input_hash = make_hash(input.split(""))
     diff = []
 
+    # compare shuffled word and input word to check if letters exist or extra letters
     input_hash.each do |k, v|
-        if shuffle_hash.has_key?(k) && v > shuffle_hash[k]
+        if shuffle_hash.has_key?(k) && v > shuffle_hash[k] #more letters than in shuffled
             diff.push(k)
-        elsif !shuffle_hash.has_key?(k)
+        elsif !shuffle_hash.has_key?(k) #letter not found in shuffled
             diff.push(k)
         else
             next
@@ -90,31 +92,50 @@ def get_word_score(word_input, score, threshold)
     word_input.chars {|x| word_score += score_key[x]}
     puts "Your word score is #{word_score}."
     
+    # add up total score
     total_score = score + word_score 
     puts "Total score is #{total_score}."
+
+    # feedback score to player
     if threshold > total_score
         puts "You need #{threshold-total_score} more points to win. Keep it up!"
     else
         puts "You have scored extra #{total_score-threshold} points!"
     end
-    return total_score
-  
+
+    return total_score 
 end
 
 # get results
 def results(score, level)
+    # feedback final score to player
     if score >= level
-        return "Your total score is #{score}, higher than #{level} points needed, you win!"
+        return "Your total score is #{score}, higher than #{level} points needed, you win!".colorize(:color => :yellow, :background => :blue)
     else
-        return "Your total score is #{score} lower than #{level} points needed, sorry not your day! Try harder next time!"
+        return "Your total score is #{score} lower than #{level} points needed, sorry you didn't win! Try harder next time!".colorize(:color => :yellow,:background => :red)
     end
 end
 
 
 def play_game
 
-    prompt = TTY::Prompt.new
- 
+    prompt = TTY::Prompt.new # use tty-prompt
+    font = TTY::Font.new(:doom) #use tty-font
+    pastel = Pastel.new #use color on tty-font
+
+    # puts out welcome message
+    puts pastel.yellow(font.write("WELCOME TO", letter_spacing: 1))
+    puts pastel.yellow(font.write("THE WORD GAME", letter_spacing: 1))
+
+    box = TTY::Box.frame(width: 50, height: 10, align: :center, border: :thick) do
+    "This is a word game. The goal of the game is to make words from a 10-letter word
+and score as many as points for the level of difficulty chosen. There are 3 levels\n
+of difficulty. In order to win, you have to score more than 10 points for the Easy\n
+level, 20 points for Medium level and 40 points for the Hard level. You will have 3\n
+inputs to make a new word.\n"
+    end
+    print box
+
      # get name
     name = prompt.ask("What is your name?")
     
@@ -170,19 +191,19 @@ def play_game
         
             # check for invalid inputs
             if !check_word
-                puts "Invalid word. Try again."
+                puts "Invalid word. Try again.".colorize(:red)
                 word_input 
                 next
             elsif check_letter.length > 0 
-                puts "Letter(s) not found or more than in word. Try again."
+                puts "Letter(s) not found or more than in word. Try again.".colorize(:red)
                 word_input 
                 next
             elsif track_word_input[word_input] > 1
-                puts "Word has been used. Try again."
+                puts "Word has been used. Try again.".colorize(:red)
                 word_input 
                 next
             else
-                puts "Valid word."
+                puts "Valid word.".colorize(:blue)
             end
             i += 1
 
@@ -202,4 +223,6 @@ def play_game
     end
 end
 
- play_game
+play_game
+
+
