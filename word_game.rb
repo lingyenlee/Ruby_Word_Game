@@ -15,8 +15,8 @@ def shuffle_word(word)
 end
 
 # get word input
-def get_word_input
-    word_input = get_response("Make a word: ")
+def get_word_input(try)
+    word_input = get_response("Make a word - Input #{try}: ")
     return word_input
 end
 
@@ -34,10 +34,12 @@ def make_hash(word)
     return hash
 end
 
-
+def get_err(message)
+    return message
+end
 
 # find word in dictionary
-def is_word(word)
+def get_word(word)
     error_message = []
     response = nil
     uri = URI('https://od-api.oxforddictionaries.com:443/api/v2/entries/en-gb/' + word)
@@ -54,34 +56,39 @@ def is_word(word)
         # parse Json to Hash
         my_resp = JSON.parse(resp)
 
-        my_resp['id']
+        # if my_resp['id']
         if my_resp['id'] == word
-            puts "Your word is valid."
-            return word
+            return "Your word is valid."
         else 
-            error_message.push("Invalid entry. Word not found.")
-            return error_message
+            return false
         end
     end
 end
 
-def check_word(shuffle_word, input_word)
-
-    hash_shuffle = make_hash(shuffle_word)
-    hash_input = make_hash(input_word)
+def check_word(shuffle, input)
 
     error_message = []
+    is_word = get_word(input)
+    hash_shuffle = make_hash(shuffle)
+    hash_input = make_hash(input)
+
+    if !is_word
+        error_message.push("Error - Invalid word. Try again.")
+    end
+
     hash_input.each do |k, v|
         if !hash_shuffle.has_key?(k) 
-            error_message.push("Invalid entry! You used letter(s) not found in the shuffled word.")
+            error_message.push("Error - letter(s) not found in word. Try again")
         elsif v > hash_shuffle[k]
-            error_message.push("Invalid entry! You used letter(s) more than there is/are in the shuffled word.")
+            error_message.push("Error - repeated letter(s). Try again")
         else
             next
         end
     end
     return error_message
 end
+
+puts check_word("consolidate", "congratulate")
 
 
 # count word score
@@ -179,19 +186,25 @@ def play_game
         end
     end    
 
-    error_message = []
-    # present shuffle word
-    i = 1
-    while i < 4 
-        word_to_play = "consolidate"
-        puts shuffle_word(word_to_play)
-        word_input = get_word_input
-        puts is_word_err = is_word(word_input)
-        if is_word_err.include?("Invalid entry")
-           
-        end
-        puts check_word_err = check_word(word_to_play, word_input)
 
+    # present shuffle word
+    word_to_play = "consolidate"
+    puts shuffled_word = shuffle_word(word_to_play)
+    i = 1
+    while i < 4
+        word_input = get_word_input(i)
+
+
+        puts rep1 = is_word(word_input)
+        puts rep2 = check_word(word_to_play, word_input)
+       
+
+        # if rep1.include?("Error") || rep2.include?("Error")# check if invlid
+        #     # puts shuffled_word
+        #     word_input = get_word_input(i)
+        # else
+        #     next
+        # end
         i += 1
     end
     
@@ -201,7 +214,7 @@ end
 
 
 # word_input
-play_game
+# play_game
 
 
 
