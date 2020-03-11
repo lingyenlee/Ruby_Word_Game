@@ -3,28 +3,21 @@
 require 'net/https'
 require 'httparty' 
 require 'json'
+require 'tty-prompt'
 
 
 # randomly shuffle word
 def shuffle_word(word)
-    word_arr = word.split("").shuffle
+    arr = word.split("").shuffle
      # randomly shuffle the letters
-    shuffle_word = word_arr.join("")
-
-     return "Your word is #{shuffle_word}."
+    shuffled_word = arr.join("")
+    return shuffled_word
 end
 
-# get word input
-def get_word_input(try)
-    word_input = get_response("Make a word - Input #{try}: ")
-    return word_input
-end
-
-
-# validate word - letters not repeated, word not repeated
+# track count of elements in array with hash
 def make_hash(word)
     hash = {}
-    word.chars do |i|
+    word.each do |i|
         if hash.has_key?(i)
             hash[i] += 1
         else
@@ -65,8 +58,8 @@ end
 def check_letter(shuffle, input)
 
     # make hash and store letter count
-    shuffle_hash = make_hash(shuffle)
-    input_hash = make_hash(input)
+    shuffle_hash = make_hash(shuffle.split(""))
+    input_hash = make_hash(input.split(""))
     diff = []
 
     input_hash.each do |k, v|
@@ -81,13 +74,8 @@ def check_letter(shuffle, input)
     return diff
 end
 
-# def get_total(acc, current)
-#     total = acc + current
-#     return total
-# end
-
 # count word score
-def get_word_score(word_input)
+def get_word_score(word_input, score, threshold)
 
     # scores for each letter
     score_key = {
@@ -97,42 +85,51 @@ def get_word_score(word_input)
 
     # initialize total score and input number
     word_score = 0
-    # total_score = 0
  
+    # map through each letter in word and count score
     word_input.chars {|x| word_score += score_key[x]}
     puts "Your word score is #{word_score}."
-    return word_score
+    
+    total_score = score + word_score 
+    puts "Total score is #{total_score}."
+    if threshold > total_score
+        puts "You need #{threshold-total_score} more points to win. Keep it up!"
+    else
+        puts "You have scored extra #{total_score-threshold} points!"
+    end
+    return total_score
   
-end
-
-# get response from input
-def get_response(prompt_text)
-    print prompt_text
-    response = gets.chomp
-    return response
 end
 
 # get results
 def results(score, level)
-
     if score >= level
-        return "Your total score is #{score} more than the required #{level}, you win!"
+        return "Your total score is #{score}, higher than #{level} points needed, you win!"
     else
-        return "Your total score is #{score} less than the required #{level}, you lose!"
+        return "Your total score is #{score} lower than #{level} points needed, sorry not your day! Try harder next time!"
     end
 end
 
 
 def play_game
+
+    prompt = TTY::Prompt.new
+ 
+     # get name
+    name = prompt.ask("What is your name?")
     
     while true
-        # get name
-        get_name = "What is your name? "
-        name = get_response(get_name)
+          # display menu of play levels
+        play_level = prompt.select("Hello #{name}, choose play level") do |level|
+            level.default 1
         
-        # get level of difficulty
-        get_level = "Hello #{name}, choose play level (points to win): 1 for Easy (10pts), 2 for Medium (20pts), 3 for Difficult (40pts) "
-        while play_level = get_response(get_level).to_i
+            level.choice "Easy (10 pts to win)", 1
+            level.choice "Medium (20 pts to win)", 2
+            level.choice "Hard (30 pts to win)", 3
+        end
+
+        # check for correct input for play level
+        while play_level == 1 || play_level == 2 || play_level == 3
             case play_level
             when 1
                 score_threshold = 10
@@ -151,46 +148,36 @@ def play_game
         # present shuffle word
         word_to_play = "consolidate"
         shuffled_word = shuffle_word(word_to_play)
+        puts "Your word is #{shuffled_word}."
+        
+        # initialize values
         arr = []
-        word_hash = {}
         i = 1
         total_score = 0
-        while i < 4
-            # display shuffled word
-            puts shuffled_word
 
-            # get word input and save to an array and make a hash to keep trash
-            word_input = get_word_input(i)
-            arr.push(word_input)
-            arr.each do |i|
-                if word_hash.has_key?(i)
-                    word_hash[i] += 1
-                else
-                    word_hash[i] = 1
-                end
-            end
+        while i < 4
         
-            # get value of checkings
+            # get word input and save to an array and make a hash to keep trash
+            word_input = prompt.ask("Make a word from #{shuffled_word} - Input #{i}")
+            
+            # save word to array and hash counter
+            arr.push(word_input)
+            track_word_input = make_hash(arr)
+        
+            # get return value of word and letter checks 
             check_word = get_word(word_input)
             check_letter = check_letter(shuffled_word, word_input)
         
-
-            if check_word && check_letter.length > 0
-                puts "Letter(s) not found or too many. Try again."
-                word_input 
-                # i -= 1
-                next
-            elsif !check_word
+            # check for invalid inputs
+            if !check_word
                 puts "Invalid word. Try again."
                 word_input 
-                # i -= 1
                 next
             elsif check_letter.length > 0 
-                puts "Letter(s) not found or too many. Try again."
+                puts "Letter(s) not found or more than in word. Try again."
                 word_input 
-                # i -= 1
                 next
-            elsif word_hash[word_input] > 1
+            elsif track_word_input[word_input] > 1
                 puts "Word has been used. Try again."
                 word_input 
                 next
@@ -198,17 +185,21 @@ def play_game
                 puts "Valid word."
             end
             i += 1
-            word_score = get_word_score(word_input)
-            total_score += word_score
-            puts "Total score is #{total_score}."
-        end
-        puts results(total_score, score_threshold)
-        play_again = get_response("Do you want to play again (y/n).")
-        
-    end
 
+            # get word score and total score
+            total_score = get_word_score(word_input, total_score, score_threshold)
+        end
+
+        # display final results
+        puts results(total_score, score_threshold)
+
+        # ask if player wants to play again
+        play_again = prompt.yes?("Do you want to play again (y/n).")
+        if !play_again
+            puts "Bye!"
+            break
+        end
+    end
 end
 
-
-# word_input
-play_game
+ play_game
