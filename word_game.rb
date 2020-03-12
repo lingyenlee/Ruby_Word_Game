@@ -51,7 +51,9 @@ def get_word(input)
     
     response = http.request(request) #save req to resonse
     # puts response.body
-    my_resp = JSON.parse(response.body) #parse response to JSON
+    my_resp = JSON.parse(response.body) #parse json response to hash
+    # puts my_resp.class
+
     if my_resp["word"] == input #return true if word exist
         return true
     else 
@@ -59,7 +61,7 @@ def get_word(input)
     end
 end
 
-
+# get_word("told")
 def check_letter(shuffled, input)
 
     # make hash and store letter count
@@ -82,12 +84,14 @@ end
 
 # Validate word input - return response for word and letter checks
 def validate_word(word, letter, input, saved_input)
-    if !word
-        puts "Invalid word. Try again.".colorize(:red)
+    if input.length < 2
+        puts "Too short. Need at least 2 characters.".colorize(:red)
+    elsif !word
+        puts "Invalid entry.".colorize(:red)
     elsif letter.length > 0 
-        puts "Letter(s) not found or more than in word. Try again.".colorize(:red)
+        puts "Letter(s) not found or more than in word.".colorize(:red)
     elsif saved_input[input] > 1
-        puts "Word has been used. Try again.".colorize(:red)
+        puts "Word has been used.".colorize(:red)
     else
         puts "Valid word.".colorize(:blue)
         return true
@@ -117,6 +121,8 @@ def get_word_score(input, score, threshold)
     # feedback score to player
     if threshold > total_score
         puts "You need #{threshold-total_score} more points to win. Keep it up!"
+    elsif threshold == total_score
+        puts "You have reached the score required to win!"
     else
         puts "You have scored extra #{total_score-threshold} points!"
     end
@@ -134,9 +140,28 @@ def results(score, level)
     end
 end
 
+# display difficulty menu
+def level_menu(name)
+    prompt = TTY::Prompt.new # use tty-prompt
 
-def play_game
+     # display menu of play levels
+     play_level = prompt.select("Hello #{name}, choose play level") do |level|
+        level.default 1
+    
+        level.choice "Easy (20 pts to win)", 1
+        level.choice "Medium (30 pts to win)", 2
+        level.choice "Hard (45 pts to win)", 3
+    end
 
+    # map play levels to score threshold
+    threshold = {1=>20, 2=>30, 3=>45}
+    
+    # return threshold values
+    return threshold[play_level]
+end
+
+# welcome message
+def welcome_message
     prompt = TTY::Prompt.new # use tty-prompt
     font = TTY::Font.new(:doom) #use tty-font
     pastel = Pastel.new #use color on tty-font
@@ -153,39 +178,24 @@ level, 20 points for Medium level and 40 points for the Hard level. You will hav
 inputs to make a new word.\n"
     end
     print box
+end
+
+
+def play_game
+
+    prompt = TTY::Prompt.new # use tty-prompt
+
+    # display welcome message
+    welcome_message
 
      # get name
     name = prompt.ask("What is your name?")
     
     while true
 
-
-          # display menu of play levels
-        play_level = prompt.select("Hello #{name}, choose play level") do |level|
-            level.default 1
-        
-            level.choice "Easy (20 pts to win)", 1
-            level.choice "Medium (30 pts to win)", 2
-            level.choice "Hard (50 pts to win)", 3
-        end
-
-        # check for correct input for play level
-        while play_level == 1 || play_level == 2 || play_level == 3
-            case play_level
-            when 1
-                score_threshold = 20
-                break
-            when 2
-                score_threshold = 30
-                break
-            when 3
-                score_threshold = 50
-                break
-            else
-                puts "You entry is not valid. Please choose again"
-            end
-        end    
-
+        # get play level and score threshold
+        score_threshold = level_menu(name)
+         
         # present shuffle word
         word_to_play = "consolidate"
         shuffled_word = shuffle_word(word_to_play)
@@ -199,8 +209,11 @@ inputs to make a new word.\n"
         while i < 5
         
             # get word input and save to an array and make a hash to keep trash
-            word_input = prompt.ask("Make a word from #{shuffled_word} - Input #{i}")
-            
+            if i == 1
+                word_input = prompt.ask("You have #{5-i} input. Make a word from #{shuffled_word}")
+            else
+                word_input = prompt.ask("You have #{5-i} input left. Make a word from #{shuffled_word}")
+            end
             # save word to array and hash counter
             arr.push(word_input)
             track_word_input = make_hash(arr)
@@ -232,3 +245,9 @@ inputs to make a new word.\n"
 end
 
 play_game
+
+# puts 1.class
+
+# prompt = TTY::Prompt.new # use tty-prompt
+# word_input = prompt.ask("Make a word from ")
+# puts word_input.class

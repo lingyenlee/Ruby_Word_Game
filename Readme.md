@@ -21,8 +21,42 @@ Player will be prompt to re-enter another word if the input word does not pass t
  
 ## List of features in the app
 
-# Feature 1 - Get 
+# Feature 1: level_menu(name)
+This feature uses the gem tty-select and takes one parameter (name of player entered). It displays the menu to allow player to choose level of difficulty. When the player selects a level, the response is saved to a variable called play_level. 
+Also creates a hash that maps play level to score threshold. Returns score threshold values 
 
-This 
+# Feature 2: get_word(input) 
+This feature uses 5 gems - uri, openssl, net/https, httparty, json and takes in one parameter (word input). Makes query of the word input from WORDSAPI. Returns JSON and is parsed to a hash and saved to "my_resp". If the word exists, it will return the true boolean, otherwise return the false boolean.
+
+# Feature 3: check_letter(shuffled, input)
+This feature checks if the validity of the letters used in the word input. The counts of each letter in the given word and the input word saved to 2 separate hashes. Each letter in the word input hash is compared the given word hash. The word is valid if it meets 2 conditions: (1)letters used are present and (2)not greater than those appear in the given word. The difference in the 2 hashes is save to an array called diff and is the returned value. 
+
+# Feature 4: validate_word(word, letter, input, saved_input)
+This feature validates the word input. It takes in 4 parameters:
+-word: the returned boolean value of get_word
+-letter: the returned array (diff) of check_letter
+-input: word input of player 
+-saved_input: a hash created and saved all word input 
+
+Four conditions must be met for the word input to be valid:
+-must have at least 2 characters
+-word exists using Feature 2
+-letters used are present and not more using Feature 3
+-word input is not duplicated (by comparing to saved_input hash)
+The feature returns warning messages if the conditions are not met and return a boolean true value if the word is valid.
+
+ # Feature 5: get_word_score(input, score, threshold)
+ This feature sums the scores of letters in the word, keep tracks of running scores and provides feedback to players on score values and points needed to win the game. It takes in 3 parameters:
+ -input: word input of player
+ -score: the initialized total score
+ -threshold: the score threshold value needed to win the game
+Creates a hash that provides the points for each letter. Each letter in the word input is mapped and calculated and saved to a variable (word_score). The running total is accumulated and saved to the total_score. An if-else statement is created to compare the scores to threshold and provide feedback to the player. Returns the running total score.
+
+# Feature 6: results(score, level)
+This features display the total score at the end of the game and indicates if the player has won or lost. It takes in 2 parameters:
+-score which is the total score at the end of game
+-level which is the score threshold needed to get over to win
+
+
 # Count word and total score
 A dictionary 
