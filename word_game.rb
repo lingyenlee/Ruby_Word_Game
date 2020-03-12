@@ -36,10 +36,10 @@ def make_hash(word)
 end
 
 # find word in dictionary
-def get_word(word)
+def get_word(input)
    
     # response = nil
-    url = URI("https://wordsapiv1.p.rapidapi.com/words/#{word}")
+    url = URI("https://wordsapiv1.p.rapidapi.com/words/#{input}")
 
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
@@ -52,7 +52,7 @@ def get_word(word)
     response = http.request(request) #save req to resonse
     # puts response.body
     my_resp = JSON.parse(response.body) #parse response to JSON
-    if my_resp["word"] == word #return true if word exist
+    if my_resp["word"] == input #return true if word exist
         return true
     else 
         return false
@@ -60,18 +60,18 @@ def get_word(word)
 end
 
 
-def check_letter(shuffle, input)
+def check_letter(shuffled, input)
 
     # make hash and store letter count
-    shuffle_hash = make_hash(shuffle.split(""))
+    shuffled_hash = make_hash(shuffled.split(""))
     input_hash = make_hash(input.split(""))
     diff = []
 
     # compare shuffled word and input word to check if letters exist or extra letters
     input_hash.each do |k, v|
-        if shuffle_hash.has_key?(k) && v > shuffle_hash[k] #more letters than in shuffled
+        if shuffled_hash.has_key?(k) && v > shuffled_hash[k] #more letters than in shuffled
             diff.push(k)
-        elsif !shuffle_hash.has_key?(k) #letter not found in shuffled
+        elsif !shuffled_hash.has_key?(k) #letter not found in shuffled
             diff.push(k)
         else
             next
@@ -80,8 +80,22 @@ def check_letter(shuffle, input)
     return diff
 end
 
+# Validate word input - return response for word and letter checks
+def validate_word(word, letter, input, saved_input)
+    if !word
+        puts "Invalid word. Try again.".colorize(:red)
+    elsif letter.length > 0 
+        puts "Letter(s) not found or more than in word. Try again.".colorize(:red)
+    elsif saved_input[input] > 1
+        puts "Word has been used. Try again.".colorize(:red)
+    else
+        puts "Valid word.".colorize(:blue)
+        return true
+    end
+end
+
 # count word score
-def get_word_score(word_input, score, threshold)
+def get_word_score(input, score, threshold)
 
     # scores for each letter
     score_key = {
@@ -93,7 +107,7 @@ def get_word_score(word_input, score, threshold)
     word_score = 0
  
     # map through each letter in word and count score
-    word_input.chars {|x| word_score += score_key[x]}
+    input.chars {|x| word_score += score_key[x]}
     puts "Your word score is #{word_score}."
     
     # add up total score
@@ -144,26 +158,28 @@ inputs to make a new word.\n"
     name = prompt.ask("What is your name?")
     
     while true
+
+
           # display menu of play levels
         play_level = prompt.select("Hello #{name}, choose play level") do |level|
             level.default 1
         
-            level.choice "Easy (10 pts to win)", 1
-            level.choice "Medium (20 pts to win)", 2
-            level.choice "Hard (30 pts to win)", 3
+            level.choice "Easy (20 pts to win)", 1
+            level.choice "Medium (30 pts to win)", 2
+            level.choice "Hard (50 pts to win)", 3
         end
 
         # check for correct input for play level
         while play_level == 1 || play_level == 2 || play_level == 3
             case play_level
             when 1
-                score_threshold = 10
-                break
-            when 2
                 score_threshold = 20
                 break
+            when 2
+                score_threshold = 30
+                break
             when 3
-                score_threshold = 40
+                score_threshold = 50
                 break
             else
                 puts "You entry is not valid. Please choose again"
@@ -180,7 +196,7 @@ inputs to make a new word.\n"
         i = 1
         total_score = 0
 
-        while i < 4
+        while i < 5
         
             # get word input and save to an array and make a hash to keep trash
             word_input = prompt.ask("Make a word from #{shuffled_word} - Input #{i}")
@@ -194,25 +210,13 @@ inputs to make a new word.\n"
             check_letter = check_letter(shuffled_word, word_input)
         
             # check for invalid inputs
-            if !check_word
-                puts "Invalid word. Try again.".colorize(:red)
-                word_input 
-                next
-            elsif check_letter.length > 0 
-                puts "Letter(s) not found or more than in word. Try again.".colorize(:red)
-                word_input 
-                next
-            elsif track_word_input[word_input] > 1
-                puts "Word has been used. Try again.".colorize(:red)
-                word_input 
-                next
-            else
-                puts "Valid word.".colorize(:blue)
-            end
-            i += 1
+            validated = validate_word(check_word, check_letter, word_input, track_word_input)
 
             # get word score and total score
-            total_score = get_word_score(word_input, total_score, score_threshold)
+            if validated
+                total_score = get_word_score(word_input, total_score, score_threshold)
+            end
+            i += 1
         end
 
         # display final results
@@ -228,5 +232,3 @@ inputs to make a new word.\n"
 end
 
 play_game
-
-
