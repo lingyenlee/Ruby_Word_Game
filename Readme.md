@@ -58,8 +58,8 @@ This features display the total score at the end of the game and indicates if th
 -level which is the score threshold needed to get over to win
 
 # Outline 
-The app starts with asking user
+The app starts with displaying the a welcome message and asking for user's name. An input is required. If the user press enter without entering, a warning message appears. After the user has provided a name, the user will be addressed by the name and is present a menu with 4 options to choose from. The user can use the up and down arrows to select the options, which is highlighted where the arrow points.
+If option 1 is chosen, the user is shown the information about the game. The user is instructed to return to main menu by pressing spacebar. 
+If option 2 is chosen, the user is shown the letter score table and exit by pressing the spacebar.
+If option 3 is chosen, the game 
 
-
-# Count word and total score
-A dictionary 

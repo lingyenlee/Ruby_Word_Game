@@ -68,7 +68,6 @@ def get_word(input)
     response = http.request(request) #save req to resonse
     # puts response.body.class
     my_resp = JSON.parse(response.body) #parse json response to hash
-    # puts my_resp["results"][0]["definition"]
 
     if my_resp["word"] == input #return true if word exist
         return true
