@@ -23,11 +23,20 @@ def shuffle_word()
     "generation", "frequently", "recognized", "restaurant", "philosophy", "adjustment", "affordable",
     "phenomenal", "acquiesced", "accustomed", "adenovirus", "basophilic", "catalogues", "dehumidify"]
     
-    # randomly shuffle the letters
-    arr = words.sample.split("").shuffle
-    shuffled_word = arr.join("")
-    return shuffled_word.upcase
+    selected_words = []
+   
+    # randomly select a word and save to an array
+    random = words.sample
+    selected_words.push(random)
+    
+     # shuffle the letters and save to the same array
+    shuffled_word = random.split("").shuffle.join("")
+    selected_words.push(shuffled_word)
+
+    # return the saved array
+    return selected_words
 end
+# puts shuffle_word()
 
 # make hash to track elements in array
 def make_hash(word)
@@ -150,7 +159,12 @@ def get_word_score(input, score, threshold)
 end
 
 # get results
-def results(score, level)
+def results(score, level, word)
+
+    pastel = Pastel.new #use tty-pastel
+    notice = pastel.blue.bold.detach
+
+    puts "The original word is " + notice.call("#{word}.")
     # display final score to player
     if score >= level
         return "Your total score is #{score}, higher than #{level} points needed, you win!".colorize(:color => :yellow, :background => :blue)
@@ -290,7 +304,10 @@ def play_game()
         score_threshold = level_menu
 
         # present shuffle word
-        shuffled_word = shuffle_word()
+        words = shuffle_word()
+
+        original_word = words[0]
+        shuffled_word = words[1]
         puts "Your word is " + notice.call("#{shuffled_word}")
         
         # initialize values
@@ -328,7 +345,7 @@ def play_game()
         end
 
         # display final results
-        puts results(total_score, score_threshold)
+        puts results(total_score, score_threshold, original_word)
         
         # ask if player wants to play again
         play_again = prompt.yes?("Do you want to play again (y/n)?")
