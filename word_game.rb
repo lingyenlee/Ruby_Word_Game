@@ -160,8 +160,8 @@ def level_menu(name)
     return threshold[play_level]
 end
 
-# welcome message
-def welcome_message
+# display menu
+def menu()
     prompt = TTY::Prompt.new # use tty-prompt
     font = TTY::Font.new(:doom) #use tty-font
     pastel = Pastel.new #use color on tty-font
@@ -170,31 +170,76 @@ def welcome_message
     puts pastel.yellow(font.write("WELCOME TO", letter_spacing: 1))
     puts pastel.yellow(font.write("THE WORD GAME", letter_spacing: 1))
 
-    box = TTY::Box.frame(width: 50, height: 10, align: :center, border: :thick) do
-    "This is a word game. The goal of the game is to make words from a 10-letter word
+    # get name
+    name = prompt.ask("Hello there, what is your name?")
+
+    user_option = nil
+    while user_option != 4
+        # present options menu
+        greeting = "Hi #{name}, selection an option below"
+        options = [{"About Game"=> 1}, {"Letter Score Values"=> 2}, {"Start Game"=> 3}, {"Exit"=> 4}] #options list
+        user_option = prompt.select(greeting, options) 
+
+        # display game info
+        if user_option == 1
+            about_game()
+
+        # display letter scores values
+        elsif user_option == 2
+            about_game()
+        
+        elsif user_option == 3
+            play_game()
+        
+        else 
+            user_option
+        end
+    end
+end
+
+# return to main menu
+def return_menu()
+    
+end
+
+
+def about_game()
+    system("clear")
+    box = TTY::Box.frame(width: 50, height: 12, align: :center, border: :thick) do
+    "HOW TO PLAY \n This is a word game. The goal of the game is to make any words from a 10-letter word
 and score as many as points for the level of difficulty chosen. There are 3 levels\n
-of difficulty. In order to win, you have to score more than 10 points for the Easy\n
+of difficulty. In order to win, you have to score more than 20 points for the Easy\n
 level, 20 points for Medium level and 40 points for the Hard level. You will have 3\n
 inputs to make a new word.\n"
     end
     print box
+
 end
+
 
 
 def play_game
 
     prompt = TTY::Prompt.new # use tty-prompt
+   
+    menu()
+    # menu_choice = menu
+   
+    # if menu_choice == 1
+    #     about_game
+    # end
+#    case menu_choice
+#    when 1
+#     about_game
+#     menu_choice
+#    when 2
 
-    # display welcome message
-    welcome_message
+#    end
 
-     # get name
-    name = prompt.ask("What is your name?")
-    
     while true
 
         # get play level and score threshold
-        score_threshold = level_menu(name)
+        # score_threshold = level_menu(name)
          
         # present shuffle word
         word_to_play = "consolidate"

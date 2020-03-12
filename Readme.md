@@ -57,6 +57,9 @@ This features display the total score at the end of the game and indicates if th
 -score which is the total score at the end of game
 -level which is the score threshold needed to get over to win
 
+# Outline 
+The app starts with asking user
+
 
 # Count word and total score
 A dictionary 
