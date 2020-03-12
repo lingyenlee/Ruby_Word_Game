@@ -59,7 +59,7 @@ def get_word(input)
     response = http.request(request) #save req to resonse
     # puts response.body.class
     my_resp = JSON.parse(response.body) #parse json response to hash
-    # puts my_resp.class
+    # puts my_resp["results"][0]["definition"]
 
     if my_resp["word"] == input #return true if word exist
         return true
@@ -67,7 +67,6 @@ def get_word(input)
         return false
     end
 end
-
 
 def check_letter(shuffled, input)
 
@@ -156,7 +155,7 @@ def results(score, level)
     if score >= level
         return "Your total score is #{score}, higher than #{level} points needed, you win!".colorize(:color => :yellow, :background => :blue)
     else
-        return "Your total score is #{score} lower than #{level} points needed, sorry you didn't win! Try harder next time!".colorize(:color => :yellow,:background => :red)
+        return "Your total score is #{score}, lower than #{level} points needed, sorry you didn't win! Try harder next time!".colorize(:color => :yellow,:background => :red)
     end
 end
 
@@ -213,7 +212,7 @@ def welcome()
 
     # puts out welcome message
     puts pastel.yellow(font.write("WELCOME TO", letter_spacing: 1))
-    puts pastel.yellow(font.write("THE WORD GAME", letter_spacing: 1))
+    puts pastel.yellow(font.write("THE WORD GAME"))
     
     # get name
     user_name = prompt.ask("Hello there, what is your name?", required: true)
@@ -266,13 +265,13 @@ def about_game()
     system("clear")
     box = TTY::Box.frame(width: TTY::Screen.width, height: 12, align: :center, border: :thick) do
 "ABOUT THIS GAME \n 
-This is a word game. You are given a 10-letter word which is randomly shuffled. 
-The goal of the game is to make any words (at least 2 characters) from the scrambled 
-word and score as many as points for the level of difficulty chosen. There are 3 
-levels of difficulty. In order to win, you have to score at least 15 points for the Easy
-level, 25 points for Medium level and 35 points for the Hard level. There will be 4
-inputs given. The input will be counted even if you enter an invalid word, so be
-careful! Good luck!"
+This is a word game. You are given a 10-letter word which is randomly shuffled.
+Each letter has points. The goal of the game is to make any words (at least 2 
+characters) from the scrambled word and score as many as points for the level 
+of difficulty chosen. There are 3 levels of difficulty. In order to win, you have 
+to score at least 15 points for the Easy level, 25 points for Medium level and 35 
+points for the Hard level. There will be 4 inputs given. The input will be counted 
+even if you enter an invalid word, so be careful and good luck!"
     end
     print box
     return_menu()
@@ -320,7 +319,7 @@ def play_game()
             validated = validate_word(check_word, check_letter, word_input, track_word_input)
 
             # get word score and total score
-            if validated
+            if validated && i <= 3
                 total_score = get_word_score(word_input, total_score, score_threshold)
             end
 
