@@ -21,7 +21,7 @@ Player will be prompt to re-enter another word if the input word does not pass t
  
 ## List of features in the app
 
-# Feature 1: level_menu(name)
+# Feature 1: Menus of playing difficulty
 This feature uses the gem tty-select and takes one parameter (name of player entered). It displays the menu to allow player to choose level of difficulty. When the player selects a level, the response is saved to a variable called play_level. Also creates a hash that maps play level to score threshold. Returns score threshold values 
 
 # Feature 2: Validate word
