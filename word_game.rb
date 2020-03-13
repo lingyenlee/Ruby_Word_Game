@@ -6,6 +6,9 @@ require 'openssl'
 require 'net/https'
 require 'httparty' 
 require 'json'
+require 'dotenv/load'
+
+# puts API_KEY = ENV['PROJECT_API_KEY']
 
 # require gems for others
 require 'tty-prompt'
@@ -53,19 +56,20 @@ end
 
 # find word in dictionary
 def get_word(input)
-   
-    # response = nil
+    
+    # Dotenv.load
+    # puts ENV['PROJECT_API_KEY']
     url = URI("https://wordsapiv1.p.rapidapi.com/words/#{input}")
 
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    
+
     request = Net::HTTP::Get.new(url) 
     request["x-rapidapi-host"] = 'wordsapiv1.p.rapidapi.com'
-    request["x-rapidapi-key"] = '1b2c49a91bmshddce31cebd15864p1a6966jsn68d6321288f9' #api key
-    
-    response = http.request(request) #save req to resonse
+    request["x-rapidapi-key"] = ENV['PROJECT_API_KEY'] #api key
+     
+    response = http.request(request) #save req to repsonse
     # puts response.body.class
     my_resp = JSON.parse(response.body) #parse json response to hash
 
@@ -75,6 +79,8 @@ def get_word(input)
         return false
     end
 end
+
+# puts get_word("word")
 
 def check_letter(shuffled, input)
 
