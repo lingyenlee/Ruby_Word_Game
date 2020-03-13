@@ -1,16 +1,12 @@
 #! /usr/bin/env ruby
 
-# require gems for making api
+# gems 
 require 'uri'
 require 'openssl'
 require 'net/https'
 require 'httparty' 
 require 'json'
 require 'dotenv/load'
-
-# puts API_KEY = ENV['PROJECT_API_KEY']
-
-# require gems for others
 require 'tty-prompt'
 require 'colorize'
 require 'tty-box'
@@ -18,47 +14,11 @@ require 'tty-font'
 require 'terminal-table'
 require 'pastel'
 
-
-# randomly chose a word from array and shuffle it
-def shuffle_word()
-
-    words = ["absolutely","collection", "applicants", "consolidate", "government", "impossible",
-    "generation", "frequently", "recognized", "restaurant", "philosophy", "adjustment", "affordable",
-    "phenomenal", "acquiesced", "accustomed", "adenovirus", "basophilic", "catalogues", "dehumidify"]
-    
-    selected_words = []
-   
-    # randomly select a word and save to an array
-    random = words.sample
-    selected_words.push(random)
-    
-     # shuffle the letters and save to the same array
-    shuffled_word = random.split("").shuffle.join("")
-    selected_words.push(shuffled_word)
-
-    # return the saved array
-    return selected_words
-end
-# puts shuffle_word()
-
-# make hash to track elements in array
-def make_hash(word)
-    hash = {}
-    word.each do |i|
-        if hash.has_key?(i)
-            hash[i] += 1
-        else
-            hash[i] = 1
-        end
-    end
-    return hash
-end
+require './helper'
 
 # find word in dictionary
 def get_word(input)
-    
-    # Dotenv.load
-    # puts ENV['PROJECT_API_KEY']
+
     url = URI("https://wordsapiv1.p.rapidapi.com/words/#{input}")
 
     http = Net::HTTP.new(url.host, url.port)
@@ -80,7 +40,6 @@ def get_word(input)
     end
 end
 
-# puts get_word("word")
 
 def check_letter(shuffled, input)
 

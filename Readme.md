@@ -52,14 +52,51 @@ The feature returns warning messages if the conditions are not met and return a 
  -threshold: the score threshold value needed to win the game
 Creates a hash that provides the points for each letter. Each letter in the word input is mapped and calculated and saved to a variable (word_score). The running total is accumulated and saved to the total_score. An if-else statement is created to compare the scores to threshold and provide feedback to the player. Returns the running total score.
 
-# Feature 6: results(score, level)
+# Feature 6: results(score, level,word)
 This features display the total score at the end of the game and indicates if the player has won or lost. It takes in 2 parameters:
 -score which is the total score at the end of game
 -level which is the score threshold needed to get over to win
+-the original word to display
 
-# Outline 
+
+# Outline - user interaction and experience
 The app starts with displaying the a welcome message and asking for user's name. An input is required. If the user press enter without entering, a warning message appears. After the user has provided a name, the user will be addressed by the name and is present a menu with 4 options to choose from. The user can use the up and down arrows to select the options, which is highlighted where the arrow points.
 If option 1 is chosen, the user is shown the information about the game. The user is instructed to return to main menu by pressing spacebar. 
 If option 2 is chosen, the user is shown the letter score table and exit by pressing the spacebar.
-If option 3 is chosen, the game 
+If option 3 is chosen, a menu with difficulty levels is presented and player can chose the level by moving up and down key. When a level is chosen, the shuffled word is given. The player will have 4 tries to make a word. After each input, the word score and running total is provided as well as number of points needed to win if not reached threshold. At the 4th input, the original word is revealed and final score is given and whether the player has won or lost the game. The player is asked whether to continue playing. If the player press no, it will return to main menu. The player can then exit by choosing option 4.
+
+# Error handling
+-Name input is required. Pressing spacebar will lead to warning message "Value must be provided"
+-During word input, warning feedback will be given to the player if the following is performed -- 1) if the player enters only 1 character, 2) if the word entered does not exist 3) if the letter input enter is not found in the word, 4)if the same letters in the input are more than those in the word.
+
+## HELP - Getting Started 
+# How to use and install application
+1.Download or clone the folder from https://github.com/lingyenlee/Ruby_Word_Game.git
+
+2.Get a API key from https://www.wordsapi.com/
+
+3.Create 2 files file named ".env" and .gitignore in the same folder as the downloaded folder. 
+
+4.In the .env file, add your API key as follow:
+`PROJECT_API_KEY=Your API Key`
+
+5.In the .gitignore file, add the following code"
+`.env`
+
+6.Install the required gems below
+'uri', 'openssl', 'httparty', 'json', 'dotenv', 'tty-prompt', 'colorize', 'tty-box','tty-font','terminal-table', 'pastel'
+
+7.cd to the directory containing all the files if not in it.
+
+8.In the terminal, start the app by running 'ruby word_game.rb'.
+
+9.The app can be run on Windows or Mac.
+
+
+
+
+
+
+
+
 
